@@ -15,7 +15,7 @@ This Terraform module creates an AWS S3 bucket configured for static website hos
 
 ```hcl
 module "static_website" {
-  source = "srajasimman/terraform-aws-s3-cloudfront-static-site/aws"
+  source = "srajasimman/s3-cloudfront-static-site/aws"
 
   bucket_name     = "my-static-website-bucket"
   domain_name     = "example.com"
