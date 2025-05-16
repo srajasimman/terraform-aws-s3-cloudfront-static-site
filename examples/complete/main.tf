@@ -7,14 +7,24 @@ provider "aws" {
   region = "us-east-1"
 }
 
+locals {
+  domain_name = "example.com"
+  bucket_name = "${replace(local.domain_name, ".", "-")}-website"
+}
+
+data "aws_route53_zone" "zone" {
+  name         = local.domain_name
+  private_zone = false
+}
+
 module "static_website" {
   source = "../../"
 
-  bucket_name     = "my-static-website-bucket-2025"
-  domain_name     = "example.com"
-  route53_zone_id = "Z1234567890ABC"
+  bucket_name     = local.bucket_name
+  domain_name     = local.domain_name
+  route53_zone_id = data.aws_route53_zone.zone.zone_id
 
-  subject_alternative_names = ["www.example.com"]
+  subject_alternative_names = ["www.${local.domain_name}"]
 
   cloudfront_price_class = "PriceClass_100"
 
@@ -22,7 +32,7 @@ module "static_website" {
     {
       allowed_headers = ["*"]
       allowed_methods = ["GET", "HEAD"]
-      allowed_origins = ["https://example.com", "https://www.example.com"]
+      allowed_origins = ["https://${local.domain_name}", "https://www.${local.domain_name}"]
       expose_headers  = ["ETag"]
       max_age_seconds = 3600
     }
